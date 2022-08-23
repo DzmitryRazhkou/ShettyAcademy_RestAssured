@@ -7,12 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import qa.com.shettyacademy.pojo.Product;
 
 import static io.restassured.RestAssured.given;
 
 public class UserID {
     public static String generateUserId(String userName, String password){
-        Credentials body = new Credentials(userName, password);
+        Product.Credentials body = new Product.Credentials(userName, password);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);

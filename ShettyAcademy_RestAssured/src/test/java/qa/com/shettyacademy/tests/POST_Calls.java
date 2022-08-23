@@ -10,13 +10,17 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
+import qa.com.shettyacademy.pojo.Order;
+import qa.com.shettyacademy.pojo.Orders;
 import qa.com.shettyacademy.pojo.Payload;
 import qa.com.shettyacademy.pojo.Product;
-import qa.com.shettyacademy.token.Credentials;
 import qa.com.shettyacademy.token.Token;
 import qa.com.shettyacademy.token.UserID;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static io.restassured.RestAssured.given;
@@ -30,12 +34,12 @@ public class POST_Calls {
 
 
     @Test
-    public static void loginCall() {
+    public void loginCall() {
 
         String email = "dimagadjilla@gmail.com";
         String password = "3036057Dr";
 
-        Credentials body = new Credentials(email, password);
+        Product.Credentials body = new Product.Credentials(email, password);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
@@ -55,6 +59,8 @@ public class POST_Calls {
                         .when().log().all().post("api/ecom/auth/login")
                         .then().log().all()
                         .statusCode(200)
+                        .and()
+                        .body("userId", equalTo("62cb9910e26b7e1a10f10d41"))
                         .extract()
                         .response();
 
@@ -65,7 +71,7 @@ public class POST_Calls {
     }
 
     @Test(enabled = false)
-    public static void validateGetAllProductsJSONSchema() {
+    public void validateGetAllProductsJSONSchema() {
 
         token = Token.generate("dimagadjilla@gmail.com", "3036057Dr");
         String path = "/Users/dzmitryrazhkou/Documents/Automation/ShettyAcademy_RestAssured/ShettyAcademy_RestAssured/src/test/java/qa/com/shettyacademy/jsonschema_contract/getAllProductsSchema.json";
@@ -85,7 +91,7 @@ public class POST_Calls {
     }
 
     @Test()
-    public static void getAllProductsTest() {
+    public void getAllProductsTest() {
         token = Token.generate("dimagadjilla@gmail.com", "3036057Dr");
         String path = "src/test/java/qa/com/shettyacademy/jsonschema_contract/getAllProductsSchema.json";
         String successMessage = "All Products fetched Successfully";
@@ -113,7 +119,7 @@ public class POST_Calls {
     }
 
     @Test
-    public static void addProductToCartTest() {
+    public void addProductToCartTest() {
 
         Product product = new Product(productId, "iphone 13 pro", "electronics",
                 "shirts", 231500, "iphone 13 pro",
@@ -149,5 +155,45 @@ public class POST_Calls {
                 .statusCode(200)
                 .and().contentType(ContentType.JSON)
                 .body("message", equalTo(successMessage));
+    }
+
+    @Test
+    public void createProductOrder() {
+        token = Token.generate("dimagadjilla@gmail.com", "3036057Dr");
+        String country = "Ukraine";
+        String successMessage = "Order Placed Successfully";
+
+        Order order = new Order(country, "6262e9d9e26b7e1a10e89c04");
+        List<Order> orders = new ArrayList<>(Arrays.asList(order));
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+
+        String ordersJson = null;
+        try {
+            ordersJson = mapper.writeValueAsString(orders);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        String orderId =
+                given().log().all()
+                        .baseUri("https://rahulshettyacademy.com/")
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", token)
+                        .body(ordersJson)
+                        .when().log().all()
+                        .post("api/ecom/order/create-order")
+                        .then().log().all()
+                        .assertThat()
+                        .statusCode(201)
+                        .and()
+                        .body("productOrderId", equalTo(productId))
+                        .body("message", equalTo(successMessage))
+                        .extract()
+                        .path("orders");
+        System.out.println(" =====> " +orderId+ " <===== ");
+
     }
 }

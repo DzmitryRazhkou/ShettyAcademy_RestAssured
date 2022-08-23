@@ -34,4 +34,15 @@ public class Product {
         this.productAddedBy = productAddedBy;
         this.__v = __v;
     }
+
+    public static class Credentials {
+
+        private String userEmail;
+        private String userPassword;
+
+        public Credentials(String userEmail, String userPassword) {
+            this.userEmail = userEmail;
+            this.userPassword = userPassword;
+        }
+    }
 }

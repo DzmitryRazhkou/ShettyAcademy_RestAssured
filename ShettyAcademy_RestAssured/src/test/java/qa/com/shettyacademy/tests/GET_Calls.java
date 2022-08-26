@@ -1,25 +1,25 @@
 package qa.com.shettyacademy.tests;
 
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.testng.annotations.Test;
+import qa.com.shettyacademy.generate.OrderID;
+import qa.com.shettyacademy.generate.ProductID;
+import qa.com.shettyacademy.token.Token;
 
 import static org.hamcrest.Matchers.*;
 import static io.restassured.RestAssured.given;
 
 public class GET_Calls {
-    private static final String orderId = "63001cc9c4d0c51f4f0f304d";
+    private static String orderId;
+    private static String productId;
+    private static String token;
 
-    private static final String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
-            ".eyJfaWQiOiI2MmNiOTkxMGUyNmI3ZTFhMTBmMTBkNDEiLCJ1c2VyRW1haWwiOiJkaW1hZ2FkamlsbGFAZ21haWwuY29tIiwidXNlck1vYmlsZSI6MzIzNDk2MjUxOSwidXNlclJvbGUiOiJjdXN0b21lciIsImlhdCI6MTY2MDg4MDY3MywiZXhwIjoxNjkyNDM4MjczfQ" +
-            ".4hrSIb5xsReZ228Ktrugeb8n7IxaHv-AwKpbv7ohXWg";
-
-
-    @Test
+    @Test(priority = 1)
     public void getProductDetailsTest() {
 
-        String productId = "6262e9d9e26b7e1a10e89c04";
+        token = Token.generate("dimagadjilla@gmail.com", "3036057Dr");
+        productId = ProductID.GenerateProductID();
         String successMessage = "Product Details fetched Successfully";
 
         RestAssured.baseURI = "https://rahulshettyacademy.com/";
@@ -38,10 +38,12 @@ public class GET_Calls {
                 .body("message", equalTo(successMessage));
     }
 
-    @Test
-    public static void GetAllCustomerOrders() {
+    @Test(priority = 2)
+    public static void getAllCustomerOrders() {
 
+        token = Token.generate("dimagadjilla@gmail.com", "3036057Dr");
         String unauthorizedMessage = "You are not authorize to view these orders";
+        orderId = OrderID.generate();
 
         RestAssured.baseURI = "https://rahulshettyacademy.com/";
         given().log().all()
@@ -56,5 +58,4 @@ public class GET_Calls {
                 .contentType(ContentType.JSON)
                 .body("message", equalTo(unauthorizedMessage));
     }
-
 }

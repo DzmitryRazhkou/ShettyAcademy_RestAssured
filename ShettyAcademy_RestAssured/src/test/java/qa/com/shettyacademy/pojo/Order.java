@@ -1,5 +1,8 @@
 package qa.com.shettyacademy.pojo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Order {
     public String country;
     public String productOrderedId;
